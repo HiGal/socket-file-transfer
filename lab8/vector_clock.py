@@ -28,6 +28,7 @@ def send_message(pipe, pid, counter):
 
 
 def recv_message(pipe, pid, counter):
+    counter[pid] += 1
     message, timestamp = pipe.recv()
     counter = calc_recv_timestamp(timestamp, counter)
     print('Message received at ' + str(pid) + local_time(counter))
@@ -40,10 +41,10 @@ def process_one(pipe12):
     counter = send_message(pipe12, pid, counter)
     counter = send_message(pipe12, pid, counter)
     counter = event(pid, counter)
-    counter = send_message(pipe12, pid, counter)
+    counter = recv_message(pipe12, pid, counter)
     counter = event(pid, counter)
     counter = event(pid, counter)
-    counter = send_message(pipe12, pid, counter)
+    counter = recv_message(pipe12, pid, counter)
 
 
 def process_two(pipe21, pipe23):
@@ -51,10 +52,10 @@ def process_two(pipe21, pipe23):
     counter = [0, 0, 0]
     counter = recv_message(pipe21, pid, counter)
     counter = recv_message(pipe21, pid, counter)
-    counter = recv_message(pipe21, pid, counter)
-    counter = send_message(pipe23, pid, counter)
+    counter = send_message(pipe21, pid, counter)
+    counter = recv_message(pipe23, pid, counter)
     counter = event(pid, counter)
-    counter = recv_message(pipe21, pid, counter)
+    counter = send_message(pipe21, pid, counter)
     counter = send_message(pipe23, pid, counter)
     counter = send_message(pipe23, pid, counter)
 
@@ -62,7 +63,7 @@ def process_two(pipe21, pipe23):
 def process_three(pipe32):
     pid = 2
     counter = [0, 0, 0]
-    counter = recv_message(pipe32, pid, counter)
+    counter = send_message(pipe32, pid, counter)
     counter = recv_message(pipe32, pid, counter)
     counter = event(pid, counter)
     counter = recv_message(pipe32, pid, counter)
